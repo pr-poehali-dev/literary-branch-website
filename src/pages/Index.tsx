@@ -9,10 +9,38 @@ const Index = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [text, setText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ name, email, text });
+    setIsSubmitting(true);
+    setSubmitMessage('');
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/8c7182c0-5f32-4a96-854d-a00d5156434b', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, text }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitMessage('Ваш текст успешно отправлен! Мы свяжемся с вами в ближайшее время.');
+        setName('');
+        setEmail('');
+        setText('');
+      } else {
+        setSubmitMessage(data.error || 'Произошла ошибка при отправке');
+      }
+    } catch (error) {
+      setSubmitMessage('Ошибка подключения к серверу. Попробуйте позже.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -95,12 +123,19 @@ const Index = () => {
                 />
               </div>
               
+              {submitMessage && (
+                <div className={`p-4 rounded-md ${submitMessage.includes('успешно') ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
+                  {submitMessage}
+                </div>
+              )}
+              
               <Button 
                 type="submit" 
                 size="lg" 
                 className="w-full h-12 text-base font-medium"
+                disabled={isSubmitting}
               >
-                Отправить на рассмотрение
+                {isSubmitting ? 'Отправка...' : 'Отправить на рассмотрение'}
               </Button>
             </form>
           </CardContent>
@@ -213,7 +248,15 @@ const Index = () => {
               <Icon name="Instagram" size={24} />
             </a>
           </div>
-          <p className="text-sm text-muted-foreground mt-8">
+          <div className="mt-6">
+            <a 
+              href="/admin" 
+              className="text-xs text-muted-foreground/50 hover:text-accent transition-colors"
+            >
+              Админ
+            </a>
+          </div>
+          <p className="text-sm text-muted-foreground mt-4">
             © 2024 Литературный Бранч. Все права защищены.
           </p>
         </div>

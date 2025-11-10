@@ -1,0 +1,36 @@
+{
+  "tests": [
+    {
+      "name": "Test POST submission",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "name": "Тестовый Автор",
+        "email": "test@example.com",
+        "text": "Это тестовый текст для проверки работы API"
+      },
+      "expectedStatus": 201
+    },
+    {
+      "name": "Test GET submissions",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Test POST validation",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "name": "",
+        "email": "test@example.com",
+        "text": ""
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
